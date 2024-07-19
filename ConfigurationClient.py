@@ -170,7 +170,12 @@ class ConfigurationClient:
 
 if __name__ == '__main__':
     #Server to connect to and authentication token
-    token = os.getenv('REDIS_TOKEN')
+    try:
+        token = os.environ['REDIS_TOKEN']
+    except KeyError:
+        raise ValueError('Please set the REDIS_TOKEN environment variable')    
+        exit(1)
+        
     host = 'detpi02'
 
     cfg = ConfigurationClient(host, token=token)
