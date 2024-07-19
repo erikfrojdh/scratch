@@ -1,7 +1,7 @@
 import zmq
 import time
 class ReceiverServer:
-    _commands = ['collect_pedestal',]
+    _commands = ['collect_pedestal','ping']
 
     def __init__(self, port=5555):
         self.context = zmq.Context()
@@ -27,6 +27,9 @@ class ReceiverServer:
     def collect_pedestal(self):
         time.sleep(1)
         return "OK:Pedestal collected"
+    
+    def ping(self):
+        return "OK:pong"
 
     def run(self):
         while True:

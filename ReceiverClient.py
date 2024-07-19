@@ -13,9 +13,13 @@ class ReceiverClient:
         print(response)
         return response
     
-    # def collect_pedestal(self):
-    #     return self._send_message(b"collect_pedestal"
+    def collect_pedestal(self):
+        return self._send_message("collect_pedestal")
+    
+    def ping(self):
+        return self._send_message("ping")
     
 if __name__ == "__main__":
     client = ReceiverClient()
     client._send_message("Hello")
+    client.collect_pedestal()
