@@ -56,6 +56,26 @@ class ConfigurationClient:
 
     
     @property
+    def file_id(self):
+        """
+        Unique identifier for the current dataset
+        """
+        res = self.client.get('file_id')
+
+        #if not set we set it to 0
+        if res is None:
+            self.client.set('file_id', 0)
+            return 0
+        return int(res)
+    
+    @file_id.setter
+    def file_id(self, value):
+        self.client.set('file_id', value)
+
+    def incr_file_id(self):
+        self.client.incr('file_id')
+
+    @property
     def base_data_dir(self):
         res = self.client.get('base_data_dir')
         if res is None:
@@ -90,15 +110,27 @@ class ConfigurationClient:
     def fname(self):
         """
         Filename for the current dataset
+        generated from the configured experiment and the current date
         """
-        res = self.client.get('fname')
+        res = self.client.get('measurement_tag')
         if res is None:
             raise ValueError('fname not set')
+        s = f'{self.file_id:03d}_{self.project_id}_{res.decode("utf-8")}_{self.today}.h5'
+        return s
+    
+    @property
+    def measurement_tag(self):
+        """
+        Tag for the current measurement
+        """
+        res = self.client.get('measurement_tag')
+        if res is None:
+            raise ValueError('measurement_tag not set')
         return res.decode('utf-8')
     
-    @fname.setter
-    def fname(self, value):
-        self.client.set('fname', value)
+    @measurement_tag.setter
+    def measurement_tag(self, value):
+        self.client.set('measurement_tag', value)
 
 
     @property
@@ -143,9 +175,13 @@ if __name__ == '__main__':
 
     cfg = ConfigurationClient(host, token=token)
 
+    #Reset all values
+    cfg.client.flushall()
+
     cfg.PI_name = 'Erik'
     cfg.project_id = 'epoc'
     cfg.experiment_class = 'UniVie'
     cfg.base_data_dir = '/data/jungfrau/instruments/jem2100plus'
-    cfg.fname = 'Lysozyme'
+    cfg.measurement_tag = 'Lysozyme'
 
+    print(cfg)
